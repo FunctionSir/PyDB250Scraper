@@ -3,9 +3,9 @@
 Author: FunctionSir
 License: AGPLv3
 Date: 2024-03-11 20:18:57
-LastEditTime: 2024-03-18 22:15:42
+LastEditTime: 2024-03-20 19:29:15
 LastEditors: FunctionSir
-Description: Get Douban TOP 250 and save to a CSV file.
+Description: Get Douban TOP 250 and save to a TSV file.
 FilePath: /PyDB250Scraper/doubantop250.py
 """
 
@@ -15,14 +15,14 @@ from lxml import etree
 
 """
 ### README ###
-Output will be a csv file.
+Output will be a TSV file.
 Option MODE is mode to open the file.
 Use "w" to overwrite, use "a" to append.
 Option GAP is secs to sleep between two requests.
 """
 
 # BASIC CONFIG #
-OUTPUT = ""
+OUTPUT = "/home/funcsir/output.tsv"
 MODE = "w"
 VERBOSE = False
 DEBUG = False
@@ -69,10 +69,18 @@ def list_to_str(l: list, sp: str) -> str:
     return r
 
 
-# BATCH strip #
+# BATCH STRIP #
 def batch_strip(l: list) -> list:
     for i in range(0, len(l)):
         l[i] = l[i].strip()
+    return l
+
+
+# BATCH BRACKETS TIDY #
+def batch_brackets_tidy(l: list) -> list:
+    for i in range(0, len(l)):
+        l[i] = l[i].replace('（', '(')
+        l[i] = l[i].replace('）', ')')
     return l
 
 
@@ -122,25 +130,26 @@ def bd_processor(l: list) -> tuple[str, str, str, str, str]:
     return (rDirectors, rActors, rYear, rCountry, rCategory)
 
 
-# MAKE CSV LINE #
-def mk_csv_line(m: Movie) -> str:
+# MAKE TSV LINE #
+def mk_tsv_line(m: Movie) -> str:
     r = ""
-    r += m.title+","
-    r += m.other+","
-    r += m.directors+","
-    r += m.actors+","
-    r += m.year+","
-    r += m.country+","
-    r += m.category+","
+    r += m.title+"\t"
+    r += m.other+"\t"
+    r += m.directors+"\t"
+    r += m.actors+"\t"
+    r += m.year+"\t"
+    r += m.country+"\t"
+    r += m.category+"\t"
     r += m.rating+"\n"
     return r
 
 
-# CSV LINE LIST #
-csvLines = []
+# TSV LINE LIST #
+tsvLines = []
 
-# FIRST LINE OF THE CSV FILE #
-csvLines.append("title,other,directors,actors,year,country,category,rating\n")
+# FIRST LINE OF THE TSV FILE #
+tsvLines.append(
+    "title\tother\tdirectors\tactors\tyear\tcountry\tcategory\trating\n")
 
 # CHECK OUTPUT FILE PATH #
 if (len(OUTPUT) < 1):
@@ -180,13 +189,14 @@ for i in range(BEGIN, END+1):
         processedBd = bd_processor(resultBd)
         movie.directors = processedBd[0]
         movie.actors = processedBd[1]
-        movie.year = processedBd[2]
+        movie.year = list_to_str(batch_brackets_tidy(
+            batch_strip(processedBd[2].split("/"))), "/")
         movie.country = processedBd[3]
         movie.category = processedBd[4]
         # PROCESS RATING #
         movie.rating = resultRating[0]
-        # MAKE CSV LINE AND APPEND TO LINE LIST #
-        csvLines.append(mk_csv_line(movie))
+        # MAKE TSV LINE AND APPEND TO LINE LIST #
+        tsvLines.append(mk_tsv_line(movie))
 
     # DEBUG SWITCH PROCESSOR #
     if DEBUG:
@@ -194,9 +204,9 @@ for i in range(BEGIN, END+1):
     else:
         sleep(GAP)
 
-# OPEN FILE AND WRITE CSV LINES TO FILE #
+# OPEN FILE AND WRITE TSV LINES TO FILE #
 file = open(OUTPUT, MODE)
-file.writelines(csvLines)
+file.writelines(tsvLines)
 
 # DONE NOTICE #
 print("Done!")
