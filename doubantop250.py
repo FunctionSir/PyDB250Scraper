@@ -3,7 +3,7 @@
 Author: FunctionSir
 License: AGPLv3
 Date: 2024-03-11 20:18:57
-LastEditTime: 2024-03-20 19:29:15
+LastEditTime: 2024-03-20 19:37:15
 LastEditors: FunctionSir
 Description: Get Douban TOP 250 and save to a TSV file.
 FilePath: /PyDB250Scraper/doubantop250.py
@@ -22,7 +22,7 @@ Option GAP is secs to sleep between two requests.
 """
 
 # BASIC CONFIG #
-OUTPUT = "/home/funcsir/output.tsv"
+OUTPUT = ""
 MODE = "w"
 VERBOSE = False
 DEBUG = False
