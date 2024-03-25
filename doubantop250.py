@@ -3,7 +3,7 @@
 Author: FunctionSir
 License: AGPLv3
 Date: 2024-03-11 20:18:57
-LastEditTime: 2024-03-20 19:37:15
+LastEditTime: 2024-03-25 19:36:45
 LastEditors: FunctionSir
 Description: Get Douban TOP 250 and save to a TSV file.
 FilePath: /PyDB250Scraper/doubantop250.py
@@ -207,6 +207,9 @@ for i in range(BEGIN, END+1):
 # OPEN FILE AND WRITE TSV LINES TO FILE #
 file = open(OUTPUT, MODE)
 file.writelines(tsvLines)
+
+# CLOSE THE FILE #
+file.close()
 
 # DONE NOTICE #
 print("Done!")
